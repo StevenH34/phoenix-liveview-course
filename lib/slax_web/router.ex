@@ -1,6 +1,6 @@
 defmodule SlaxWeb.Router do
-  use SlaxWeb, :router
-
+  use SlaxWeb, :router  # Tells the compiles this is a router module
+                        # Makes functions like scope and pipeline work
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -17,7 +17,8 @@ defmodule SlaxWeb.Router do
   scope "/", SlaxWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    #get "/", PageController, :home
+    live "/", ChatRoomLive
   end
 
   # Other scopes may use custom stacks.
