@@ -53,7 +53,7 @@ defmodule SlaxWeb.ChatRoomLive do
         "flex items-center h-8 text-sm pl-8 pr-3",
         (@active && "bg-slate-300") || "hover:bg-slate-300"
       ]}
-      href="#"
+      href={~p"/rooms/#{@room}"}
     >
       <.icon name="hero-hashtag" class="h-4 w-4" />
       <span class={["ml-2 leading-none", @active && "font-bold"]}>
@@ -63,13 +63,19 @@ defmodule SlaxWeb.ChatRoomLive do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     # mount must return a tuple with the fist arg being :ok
     # second elem is the socket. An instance of %Phoenix.LiveView.Socket{}.
 
     # Loading %Room{}
     rooms = Repo.all(Room)
-    room = List.first(rooms)
+    room =
+      case Map.fetch(params, "id") do
+        {:ok, id} ->
+          Repo.get(Room, id)
+        :error ->
+          List.first(rooms)
+      end
 
     # socket.assigns is a map of assigns
     # This gets passed to render/1 as assigns
