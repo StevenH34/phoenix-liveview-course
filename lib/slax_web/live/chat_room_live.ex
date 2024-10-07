@@ -48,41 +48,41 @@ defmodule SlaxWeb.ChatRoomLive do
 
   defp room_link(assigns) do
     ~H"""
-    <a
+    <.link
       class={[
         "flex items-center h-8 text-sm pl-8 pr-3",
         (@active && "bg-slate-300") || "hover:bg-slate-300"
       ]}
-      href={~p"/rooms/#{@room}"}
+      patch={~p"/rooms/#{@room}"}
     >
       <.icon name="hero-hashtag" class="h-4 w-4" />
       <span class={["ml-2 leading-none", @active && "font-bold"]}>
         <%= @room.name %>
       </span>
-    </a>
+    </.link>
     """
   end
 
-  def mount(params, _session, socket) do
-    # mount must return a tuple with the fist arg being :ok
-    # second elem is the socket. An instance of %Phoenix.LiveView.Socket{}.
-
-    # Loading %Room{}
+  def mount(_params, _session, socket) do
     rooms = Repo.all(Room)
+    # socket.assigns is a map of assigns
+    # This gets passed to render/1 as assigns
+    {:ok, assign(socket, rooms: rooms)}
+  end
+
+  def handle_event("toggle-topic", _params, socket) do
+    {:noreply, update(socket, :hide_topic?, &(!&1))}
+  end
+
+  def handle_params(params, _session, socket) do
     room =
       case Map.fetch(params, "id") do
         {:ok, id} ->
           Repo.get(Room, id)
         :error ->
-          List.first(rooms)
+          List.first(socket.assigns.rooms)
       end
 
-    # socket.assigns is a map of assigns
-    # This gets passed to render/1 as assigns
-    {:ok, assign(socket, hide_topic?: false, room: room, rooms: rooms)}
-  end
-
-  def handle_event("toggle-topic", _params, socket) do
-    {:noreply, update(socket, :hide_topic?, &(!&1))}
+    {:noreply, assign(socket, hide_topic?: false, room: room)}
   end
 end
