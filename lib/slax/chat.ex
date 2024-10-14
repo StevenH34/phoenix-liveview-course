@@ -42,4 +42,14 @@ defmodule Slax.Chat do
     |> preload(:user)  # Preload the user association
     |> Repo.all() # Get the list of messages
   end
+
+  def change_message(message, attrs \\ %{}) do
+    Message.changeset(message, attrs)
+  end
+
+  def create_message(room, attrs, user) do
+    %Message{room: room, user: user}
+    |> Message.changeset(attrs)
+    |> Repo.insert()
+  end
 end
