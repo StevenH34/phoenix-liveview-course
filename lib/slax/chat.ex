@@ -39,6 +39,7 @@ defmodule Slax.Chat do
     Message
     |> where([m], m.room_id == ^room_id)  # Filter messages by their room ID
     |> order_by([m], asc: :inserted_at, asc: :id)  # Order msgs by timestamp, oldest first. Secondary sort by id.
+    |> preload(:user)  # Preload the user association
     |> Repo.all() # Get the list of messages
   end
 end
