@@ -1,7 +1,7 @@
 # Context file
 # Contexts are Elixir modules that talk to ext service, such as an db or API
 defmodule Slax.Chat do
-  alias Slax.Chat.Room
+  alias Slax.Chat.{Message, Room}
   alias Slax.Repo
 
   import Ecto.Query
@@ -32,5 +32,13 @@ defmodule Slax.Chat do
     room
     |> Room.changeset(attrs)
     |> Repo.update()
+  end
+
+  def list_messages_in_room(%Room{id: room_id}) do
+    # Build the Ecto Query
+    Message
+    |> where([m], m.room_id == ^room_id)  # Filter messages by their room ID
+    |> order_by([m], asc: :inserted_at, asc: :id)  # Order msgs by timestamp, oldest first. Secondary sort by id.
+    |> Repo.all() # Get the list of messages
   end
 end
